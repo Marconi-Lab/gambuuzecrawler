@@ -46,7 +46,14 @@ try:
         anchor_tags = extract_text(anchor_tags)
 
         page_data = headings+list_items+paragraphs+anchor_tags
-        
-        client.gambuuze.lines.insert({"text": "ben", "date": date.now()})
-except errors.DuplicateKeyError:
-    print("Text already exists")
+        for text in set(page_data):
+            if len(i.split(" ")) < 4:
+                continue
+            else:
+                try:
+                    client.gambuuze.lines.insert({"text": text, "date": date.now()})
+                except errors.DuplicateKeyError:
+                    print("Text already exists")
+                    continue
+except Exception as e:
+    print(e)
