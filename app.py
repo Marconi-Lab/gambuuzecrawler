@@ -21,6 +21,8 @@ client = MongoClient(DATABASE_URL)
 # Crawl site
 TARGET_URL = os.getenv('TARGET_URL')
 try:
+    all_urls = crawl(TARGET_URL)
+    
     client.gambuuze.lines.create_index([("name", ASCENDING)], unique=True)
     client.gambuuze.lines.insert({"text": "ben", "date": date.now()})
 except errors.DuplicateKeyError:
