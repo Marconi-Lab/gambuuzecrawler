@@ -17,7 +17,6 @@ def get_all_website_links(url):
     """
     print(f"Crawling {url}.")
     urls = set()
-    domain_name = urlparse(url).netloc
     soup = BeautifulSoup(urlopen(url).read())
     
     for a_tag in soup.findAll("a"):
@@ -31,3 +30,10 @@ def get_all_website_links(url):
         urls.add(href)
         all_urls.add(href)
     return urls
+
+def crawl(url):
+    global all_urls
+    links = get_all_website_links(url)
+    for link in links:
+        get_all_website_links(link)
+    return all_urls
