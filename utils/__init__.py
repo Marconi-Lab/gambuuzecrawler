@@ -8,3 +8,26 @@ def is_valid(url):
     """
     parsed = urlparse(url)
     return bool(parsed.netloc) and bool(parsed.scheme)
+
+all_urls = set()
+def get_all_website_links(url):
+    """
+    Returns all URLs that are found on the website
+    
+    """
+    print(f"Crawling {url}.")
+    urls = set()
+    domain_name = urlparse(url).netloc
+    soup = BeautifulSoup(urlopen(url).read())
+    
+    for a_tag in soup.findAll("a"):
+        href = a_tag.attrs.get("href")
+        if not "https://gambuuze" in href:
+            continue
+        if not is_valid(href):
+            continue
+        if href in urls:
+            continue
+        urls.add(href)
+        all_urls.add(href)
+    return urls
