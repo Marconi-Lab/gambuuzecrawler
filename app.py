@@ -1,9 +1,10 @@
 # Import libraries
 from dotenv import load_dotenv
 from pymongo import MongoClient, ASCENDING, errors
-from urllib.request import urlopen
 from datetime import datetime as date
+from bs4 import BeautifulSoup
 import os
+import requests
 
 # Import utils
 from utils import crawl
@@ -30,7 +31,8 @@ try:
     client.gambuuze.lines.create_index([("name", ASCENDING)], unique=True)
 
     for link in all_urls:
-        page = BeautifulSoup(urlopen(link).read())
+        res = requests.get(link)
+        page = BeautifulSoup(res, 'lxml')
     
         # Select all headings
         headings = page.select(".jeg_post_title")

@@ -1,9 +1,9 @@
-from urllib.request import urlopen, urlparse, urljoin
+from urllib.request import urlopen, urlparse
 from bs4 import BeautifulSoup
-import re
+import requests
 
 def is_valid(url):
-    """
+    """s
         checks whether 'url' is a valid URL
     """
     parsed = urlparse(url)
@@ -17,7 +17,8 @@ def get_all_website_links(url):
     """
     print(f"Crawling {url}.")
     urls = set()
-    soup = BeautifulSoup(urlopen(url).read())
+    res = requests.get(url)
+    soup = BeautifulSoup(res.text, 'lxml')
     
     for a_tag in soup.findAll("a"):
         href = a_tag.attrs.get("href")
