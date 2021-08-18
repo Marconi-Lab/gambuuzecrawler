@@ -1,6 +1,9 @@
 from urllib.request import urlopen, urlparse
 from bs4 import BeautifulSoup
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+import time
 
 def is_valid(url):
     """s
@@ -17,19 +20,28 @@ def get_all_website_links(url):
     """
     print(f"Crawling {url}.")
     urls = set()
-    res = requests.get(url)
+    session = requests.Session()
+    retry  = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    res = session.get(url)
     soup = BeautifulSoup(res.text, 'lxml')
     
     for a_tag in soup.findAll("a"):
-        href = a_tag.attrs.get("href")
-        if not "https://gambuuze" in href:
+        try:
+            href = a_tag.attrs.get("href")
+            if not "https://gambuuze" in href:
+                continue
+            if not is_valid(href):
+                continue
+            if href in urls:
+                continue
+            urls.add(href)
+            all_urls.add(href)
+        except Exception as e:
+            print(e)
             continue
-        if not is_valid(href):
-            continue
-        if href in urls:
-            continue
-        urls.add(href)
-        all_urls.add(href)
     return urls
 
 def crawl(url):
@@ -37,4 +49,5 @@ def crawl(url):
     links = get_all_website_links(url)
     for link in links:
         get_all_website_links(link)
+        time.sleep(3)
     return all_urls
