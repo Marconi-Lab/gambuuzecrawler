@@ -1,4 +1,4 @@
-from urllib.request import urlopen, urlparse
+from urllib.request import urlparse
 from bs4 import BeautifulSoup
 import requests
 from requests.adapters import HTTPAdapter
