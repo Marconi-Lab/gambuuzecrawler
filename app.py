@@ -28,11 +28,11 @@ def extract_text(array):
 TARGET_URL = os.getenv('TARGET_URL')
 try:
     all_urls = crawl(TARGET_URL)
-    client.gambuuze.lines.create_index([("name", ASCENDING)], unique=True)
+    client.gambuuze.lines.create_index([("text", ASCENDING)], unique=True)
 
     for link in all_urls:
         res = requests.get(link)
-        page = BeautifulSoup(res, 'lxml')
+        page = BeautifulSoup(res.text, 'lxml')
     
         # Select all headings
         headings = page.select(".jeg_post_title")
@@ -49,13 +49,13 @@ try:
 
         page_data = headings+list_items+paragraphs+anchor_tags
         for text in set(page_data):
-            if len(i.split(" ")) < 4:
+            if len(text.split(" ")) < 4:
                 continue
             else:
                 try:
-                    client.gambuuze.lines.insert({"text": text, "date": date.now()})
+                    print(f"Writing {str(text)}")
+                    client.gambuuze.lines.insert({"text": str(text), "date": date.now()})
                 except errors.DuplicateKeyError:
                     print("Text already exists")
-                    continue
 except Exception as e:
     print(e)
