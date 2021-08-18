@@ -26,6 +26,7 @@ client = MongoClient(DATABASE_URL)
 def extract_text(array):
     """" Extracts text for every element in the array"""
     new_set = set()
+    new_set_long = set()
     # Special character regex
     regex = re.compile('[_#$^*=<>©@\|}{~]')
     for i in array:
@@ -34,11 +35,14 @@ def extract_text(array):
         text = i.get_text()
         # Check if string consists Special character
         if regex.search(text) == None:
-            new_set.add(text)
+            if len(text.split(" ")) > 14:
+                new_set_long.add(text)
+            else:
+                new_set.add(text)
         else:
             continue
         
-    return new_set
+    return new_set, new_set_long
 
 # Crawl site
 def run(url):
@@ -46,6 +50,7 @@ def run(url):
         all_urls = crawl(url)
         # Create index key (text)
         client.gambuuze.lines.create_index([("text", ASCENDING)], unique=True)
+        client.gambuuze.linesLong.create_index([("text", ASCENDING)], unique=True)
 
         for link in all_urls:
             session = requests.Session()
@@ -58,15 +63,16 @@ def run(url):
         
             # Select all headings
             headings = page.select("h1")
-            headings = extract_text(headings)
+            headings, headings_long = extract_text(headings)
             # Select all Paragraphs
             paragraphs = page.select("p")
-            paragraphs = extract_text(paragraphs)
+            paragraphs, paragraphs_long = extract_text(paragraphs)
             # Select all anchor tags
             anchor_tags = page.select("a")
-            anchor_tags = extract_text(anchor_tags)
+            anchor_tags, anchor_tags_long = extract_text(anchor_tags)
 
             page_data = headings.union(paragraphs,anchor_tags)
+            page_data_long = headings_long.union(paragraphs_long, anchor_tags_long)
             for text in page_data:
                 if len(text.split(" ")) < 4:
                     continue
@@ -74,6 +80,15 @@ def run(url):
                     try:
                         print(f"Writing {str(text)}")
                         client.gambuuze.lines.insert({"text": str(text), "date": date.now()})
+                    except errors.DuplicateKeyError:
+                        print("Text already exists")
+            for text in page_data_long:
+                if len(text.split(" ")) < 4:
+                    continue
+                else:
+                    try:
+                        print(f"Writing {str(text)}")
+                        client.gambuuze.linesLong.insert({"text": str(text), "date": date.now()})
                     except errors.DuplicateKeyError:
                         print("Text already exists")
     except Exception as e:
