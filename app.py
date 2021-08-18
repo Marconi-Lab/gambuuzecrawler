@@ -22,7 +22,12 @@ client = MongoClient(DATABASE_URL)
 
 def extract_text(array):
     """" Extracts text for every element in the array"""
-    return [i.get_text() for i in array]
+    new_set = set()
+    for i in new_set:
+        for j in i.find_all():
+            j.decompose()
+        new_set.add(i)
+    return new_set
 
 # Crawl site
 TARGET_URL = os.getenv('TARGET_URL')
@@ -37,9 +42,6 @@ try:
         # Select all headings
         headings = page.select(".jeg_post_title")
         headings = extract_text(headings)
-        # Select all list items
-        list_items = page.select("li")
-        list_items = extract_text(list_items)
         # Select all Paragraphs
         paragraphs = page.select("p")
         paragraphs = extract_text(paragraphs)
@@ -47,8 +49,8 @@ try:
         anchor_tags = page.select("a")
         anchor_tags = extract_text(anchor_tags)
 
-        page_data = headings+list_items+paragraphs+anchor_tags
-        for text in set(page_data):
+        page_data = headings.union(paragraphs,anchor_tags)
+        for text in page_data:
             if len(text.split(" ")) < 4:
                 continue
             else:
