@@ -23,12 +23,20 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 client = MongoClient(DATABASE_URL)
 
+def remove_unrecognizable_chars(text):
+    text.replace("\n", " ")
+    text.replace("‘", "'")
+    text.replace("”", "")
+    text.replace("’", "'")
+    text.replace("“", "")
+    
+
 def extract_text(array):
     """" Extracts text for every element in the array"""
     new_set = set()
     new_set_long = set()
     # Special character regex
-    regex = re.compile('[_#$^*=<>©@\|}{~]')
+    regex = re.compile('[_#$^*=<>©@\|}{~]�')
     for i in array:
         for j in i.find_all():
             j.decompose()
