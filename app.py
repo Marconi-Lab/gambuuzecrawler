@@ -29,6 +29,8 @@ def remove_unrecognizable_chars(text):
     text.replace("”", "")
     text.replace("’", "'")
     text.replace("“", "")
+    text.replace("–", "-")
+    text.replace("  ", " ")
     
 
 def extract_text(array):
