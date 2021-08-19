@@ -24,14 +24,14 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 client = MongoClient(DATABASE_URL)
 
 def remove_unrecognizable_chars(text):
-    text.replace("\n", " ")
-    text.replace("‘", "'")
-    text.replace("”", "")
-    text.replace("’", "'")
-    text.replace("“", "")
-    text.replace("–", "-")
-    text.replace("  ", " ")
-    
+    text = text.replace("\n", " ")
+    text = text.replace("‘", "'")
+    text = text.replace("”", "")
+    text = text.replace("’", "'")
+    text = text.replace("“", "")
+    text = text.replace("–", "-")
+    text = text.replace("  ", " ")
+    return text
 
 def extract_text(array):
     """" Extracts text for every element in the array"""
@@ -43,7 +43,9 @@ def extract_text(array):
         for j in i.find_all():
             j.decompose()
         text = i.get_text()
+        text = remove_unrecognizable_chars(text)
         # Check if string consists Special character
+        
         if regex.search(text) == None:
             if len(text.split(" ")) > 14:
                 new_set_long.add(text)
