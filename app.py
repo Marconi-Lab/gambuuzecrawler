@@ -45,10 +45,11 @@ def extract_text(array):
         text = i.get_text()
         text = remove_unrecognizable_chars(text)
         # Check if string consists Special character
-        
         if regex.search(text) == None:
             if len(text.split(" ")) > 14:
-                new_set_long.add(text)
+                text = text.split(".")
+                for txt in text:
+                    new_set_long.add(txt)
             else:
                 new_set.add(text)
         else:
