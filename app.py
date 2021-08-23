@@ -32,7 +32,13 @@ def remove_unrecognizable_chars(text):
     text = text.replace("–", "-")
     text = text.replace("  ", " ")
     return text
-
+def resolve_initials(text):
+    initials = ["Prof.", "Eng.", "Dr.", "Owek.", "Gen.", "Rev.", "Omuk.", "Muky.", "St.", "Oweek."]
+    initial_resolutions = ["Prof", "Eng", "Dr", "Owek", "Gen", "Rev", "Omuk", "Muky", "St", "Oweek"]
+    for i, initial in enumerate(initials):
+        text = text.replace(initial, initial_resolutions[i])
+    return text
+    
 def extract_text(array):
     """" Extracts text for every element in the array"""
     new_set = set()
@@ -44,6 +50,7 @@ def extract_text(array):
             j.decompose()
         text = i.get_text()
         text = remove_unrecognizable_chars(text)
+        text = resolve_initials(text)
         # Check if string consists Special character
         if regex.search(text) == None:
             if len(text.split(" ")) > 14:
